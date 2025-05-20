@@ -50,14 +50,14 @@ export default function Home() {
 
       {/* Hero Section - Redesigned based on the image */}
       <section className="relative bg-gray-50 overflow-hidden">
-        <div className="container mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center">
-          <div className="w-full md:w-1/2 z-10">
-            <h1 className="text-7xl md:text-8xl font-bold text-green-500 tracking-tight leading-none mb-6">
-              GREEN<span className="text-black">_</span>
-              <span className="text-green-500 font-black">CITY</span>
+        <div className="container mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-start">
+          <div className="w-full md:w-2/3 z-10">
+            <h1 className="text-7xl md:text-[180px] font-bold text-[#00CA51] tracking-tight leading-none mb-16 mt-60">
+              GREEN<span className="text-[#00CA51] ">_</span>
+              <span className="text-[#00CA51] font-black">CITY</span>
             </h1>
-            <div className="bg-white p-6 rounded-lg shadow-md max-w-md mb-8">
-              <h2 className="text-2xl font-bold mb-2">UNE VILLE VERTE</h2>
+            <div className="border-black p-6 rounded-lg shadow-md max-w-md mt-52 border-2">
+              <h2 className="text-4xl font-bold mb-2">UNE VILLE VERTE</h2>
               <p className="text-gray-700 mb-4">
                 Et si votre ville vous aidait à sauver la planète, sans même que vous y pensiez ?
               </p>
@@ -65,15 +65,16 @@ export default function Home() {
                 <ArrowDown className="h-6 w-6 text-gray-400" />
               </div>
             </div>
-            <div className="text-sm text-gray-500">Hackathon 2025</div>
+            <div className="text-sm text-gray-500 absolute bottom-8 left-4 md:left-8">Hackathon 2025</div>
           </div>
-          <div className="w-full md:w-1/2 relative h-[500px] mt-8 md:mt-0">
+          <div className="w-full md:w-1/3 relative h-[792px] mt-8 md:mt-0 absolute right-0">
+            <div className="h-1/3 absolute left-[-10px] bottom-28 w-[1px] bg-black"></div>
             <Image
-              src="/images/background.png"
-              alt="Immeuble avec arbres verts"
-              fill
-              className="object-cover rounded-lg"
-              priority
+                src="/images/background.png"
+                alt="Immeuble avec arbres verts"
+                fill
+                className="object-cover rounded-lg"
+                priority
             />
           </div>
         </div>
