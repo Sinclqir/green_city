@@ -8,7 +8,10 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Green City - La ville verte de demain",
   description: "Construisons ensemble la ville verte de demain",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/images/tab-logo.png'
+  }
 }
 
 export default function RootLayout({

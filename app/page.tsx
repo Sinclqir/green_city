@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -15,8 +17,18 @@ import {
 import { Button } from "@/components/ui/button"
 import { FlipCard } from "@/components/flip-card"
 import DownButton from "@/components/ui/down-button"
+import { Modal, Person } from "@/components/ui/modal"
+import { useState } from "react"
 
 export default function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [people, setPeople] = useState<Person[]>([])
+
+  const handleSubmit = (person: Person) => {
+    setPeople([...people, person])
+    setIsModalOpen(false)
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -83,7 +95,7 @@ export default function Home() {
       {/* Stats Section */}
       <section className="bg-gray-50 py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Objectif pour toutes les futures Green City de 2050</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Objectif pour  les futures Green City de 2050</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="flex justify-center mb-4">
@@ -271,7 +283,16 @@ export default function Home() {
               "Depuis que notre quartier a été transformé avec plus d'espaces verts et de pistes cyclables, ma qualité de
               vie s'est considérablement améliorée. Je respire mieux et je redécouvre ma ville à vélo."
             </blockquote>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                <Image
+                  src="/images/marie.PNG"
+                  alt="Marie Dupont"
+                  width={64}
+                  height={64}
+                  className="object-cover w-full h-full"
+                />
+              </div>
               <div>
                 <p className="font-semibold">Marie Dupont</p>
                 <p className="text-gray-500 text-sm">Résidente depuis 15 ans</p>
@@ -290,7 +311,16 @@ export default function Home() {
             <blockquote className="text-lg text-gray-700 text-center italic mb-6">
               "Les panneaux solaires installés sur les toits de notre immeuble ont permis de réduire notre facture d'électricité de 40%. C'est un investissement qui porte ses fruits et qui contribue à la transition écologique."
             </blockquote>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                <Image
+                  src="/images/charles.PNG"
+                  alt="Charles Martin"
+                  width={64}
+                  height={64}
+                  className="object-cover w-full h-full"
+                />
+              </div>
               <div>
                 <p className="font-semibold">Charles Martin</p>
                 <p className="text-gray-500 text-sm">Propriétaire d'un immeuble</p>
@@ -309,7 +339,16 @@ export default function Home() {
             <blockquote className="text-lg text-gray-700 text-center italic mb-6">
               "Le nouveau système de tri sélectif et les composteurs collectifs ont créé une vraie dynamique dans notre quartier. On se sent tous plus impliqués dans la protection de l'environnement."
             </blockquote>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                <Image
+                  src="/images/eric.PNG"
+                  alt="Éric Dubois"
+                  width={64}
+                  height={64}
+                  className="object-cover w-full h-full"
+                />
+              </div>
               <div>
                 <p className="font-semibold">Éric Dubois</p>
                 <p className="text-gray-500 text-sm">Membre du conseil de quartier</p>
@@ -327,9 +366,26 @@ export default function Home() {
             Ensemble, nous pouvons transformer notre ville en un espace plus vert, plus sain et plus agréable à vivre
             pour les générations futures.
           </p>
-          <button className="bg-white text-green-500 px-8 py-3 rounded-full hover:bg-gray-100 transition-colors font-semibold">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-white text-green-500 px-8 py-3 rounded-full hover:bg-gray-100 transition-colors font-semibold"
+          >
             Je soutiens la transition écologique dans ma ville
           </button>
+          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleSubmit} />
+          <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {people.map((person, idx) => (
+              <div key={idx} className="flex items-center bg-white border border-green-200 rounded-lg p-4 shadow-sm">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold mr-4">
+                  {person.name[0].toUpperCase()}
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-800">{person.name}</div>
+                  <div className="text-gray-500 text-xs">{person.idea}</div>
+                </div>
+              </div>
+            ))}
+          </div>
           <div className="mt-12 grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="bg-green-600 bg-opacity-30 p-6 rounded-lg text-white">
               <h3 className="text-xl font-semibold mb-3">Faire un don</h3>
