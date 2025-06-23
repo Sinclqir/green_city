@@ -3,20 +3,13 @@
 import { useState } from "react"
 import { X } from "lucide-react"
 
-export interface Person {
-  name: string
-  email: string
-  idea: string
-}
-
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (person: Person) => void
 }
 
-export function Modal({ isOpen, onClose, onSubmit }: ModalProps) {
-  const [formData, setFormData] = useState<Person>({
+export function Modal({ isOpen, onClose }: ModalProps) {
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     idea: "",
@@ -24,8 +17,9 @@ export function Modal({ isOpen, onClose, onSubmit }: ModalProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(formData)
-    setFormData({ name: "", email: "", idea: "" })
+    // Here you would typically handle the form submission
+    console.log(formData)
+    onClose()
   }
 
   if (!isOpen) return null
