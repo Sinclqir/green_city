@@ -7,10 +7,10 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), unique=True, index=True)
-    name = Column(String(255))
+    name = Column(String(255), nullable=True)
     hashed_password = Column(String(255))
     is_admin = Column(Boolean, default=False)
-    ideas = relationship("Idea", back_populates="user")
+    ideas = relationship("Idea", back_populates="user", cascade="all, delete-orphan")
 
 class Idea(Base):
     __tablename__ = "ideas"

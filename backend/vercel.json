@@ -1,9 +1,14 @@
 {
     "version": 2,
     "builds": [
-      { "src": "api/index.py", "use": "@vercel/python" }
+      { "src": "app/main.py", "use": "@vercel/python" }
     ],
     "routes": [
-      { "src": "/(.*)", "dest": "api/index.py" }
-    ]
+      { "src": "/(.*)", "dest": "app/main.py" }
+    ],
+    "env": {
+      "DATABASE_URL": "@database_url",
+      "ADMIN_EMAIL": "@admin_email",
+      "ADMIN_PASSWORD": "@admin_password"
+    }
   }

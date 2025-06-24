@@ -4,7 +4,7 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     email: EmailStr
-    name: str
+    name: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str
@@ -26,6 +26,7 @@ class Idea(IdeaBase):
     id: int
     user_id: int
     created_at: str
+    user: User
 
     class Config:
         from_attributes = True

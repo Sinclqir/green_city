@@ -17,20 +17,145 @@ import {
 import { Button } from "@/components/ui/button"
 import { FlipCard } from "@/components/flip-card"
 import DownButton from "@/components/ui/down-button"
-import { Modal, Person } from "@/components/ui/modal"
-import { useState } from "react"
+import { Modal } from "@/components/ui/modal"
+import { useState, useEffect, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import ScrollToForm from "@/components/ScrollToForm"
+
+// Déclare la constante API_URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+
+// Déclare le type Person localement
+interface Person {
+  id?: number
+  name: string
+  email: string
+  idea: string
+}
+
+// Déclare le type Idea
+interface Idea {
+  id?: number
+  idea: string
+  user_id?: number
+  created_at?: string
+  user?: Person
+}
+
+interface CurrentUser {
+  email: string;
+  name: string | null;
+  id: number;
+  is_admin: boolean;
+}
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [people, setPeople] = useState<Person[]>([])
+  const [ideas, setIdeas] = useState<Idea[]>([])
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
-  const handleSubmit = (person: Person) => {
-    setPeople([...people, person])
-    setIsModalOpen(false)
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        const fetchUser = async () => {
+            try {
+                const res = await fetch(`${API_URL}/users/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (res.ok) {
+                    const userData = await res.json();
+                    setCurrentUser(userData);
+                } else {
+                    localStorage.removeItem('token');
+                }
+            } catch (error) {
+                console.error("Failed to fetch user", error);
+            }
+        };
+        fetchUser();
+    }
+  }, []);
+
+  // Charger la liste des utilisateurs depuis l'API
+  useEffect(() => {
+    const fetchPeople = async () => {
+      try {
+        const res = await fetch(`${API_URL}/users/`)
+        if (res.ok) {
+          const data = await res.json()
+          setPeople(data)
+        }
+      } catch (err) {
+        // Optionnel : gestion d'erreur
+      }
+    }
+    fetchPeople()
+  }, [])
+
+  // Charger la liste des idées depuis l'API
+  useEffect(() => {
+    const fetchIdeas = async () => {
+      try {
+        const res = await fetch(`${API_URL}/ideas/`)
+        if (res.ok) {
+          const data = await res.json()
+          setIdeas(data)
+        }
+      } catch (err) {
+        // Optionnel : gestion d'erreur
+      }
+    }
+    fetchIdeas()
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setCurrentUser(null);
+  };
+
+  // Soumission du formulaire
+  const handleSubmit = async (idea: string) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert("Vous devez être connecté pour soumettre une idée.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`${API_URL}/ideas/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ idea: idea }),
+      })
+      
+      if (!res.ok) {
+        throw new Error('Erreur lors de la soumission de l\'idée');
+      }
+
+      const newIdea = await res.json();
+      setIdeas([newIdea, ...ideas]); // Ajoute la nouvelle idée en haut de la liste
+      setIsModalOpen(false);
+
+    } catch (err) {
+      alert('Erreur: ' + (err as Error).message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <div className="min-h-screen bg-white">
+      <Suspense fallback={null}>
+        <ScrollToForm />
+      </Suspense>
       {/* Navigation */}
       <header className="container mx-auto px-4 py-6 flex justify-between items-center">
         <div className="flex items-center">
@@ -54,9 +179,30 @@ export default function Home() {
           <Link href="/jeu" className="text-gray-700 hover:text-green-500 transition-colors">
             Jeu
           </Link>
+          {currentUser?.is_admin && (
+            <Link href="/dashboard" className="text-gray-700 hover:text-green-500 transition-colors font-bold">
+              Dashboard
+            </Link>
+          )}
         </div>
-        <div className="flex items-center">
-          
+        <div className="flex items-center space-x-4">
+          {currentUser ? (
+            <>
+              <p className="text-[#00CA51] font-semibold">{currentUser.email}</p>
+              <Button onClick={handleLogout} variant="outline" size="sm">
+                Déconnexion
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" passHref>
+                <Button variant="outline">Connexion</Button>
+              </Link>
+              <Link href="/register" passHref>
+                <Button className="bg-green-500 hover:bg-green-600 text-white">Inscription</Button>
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
@@ -77,7 +223,6 @@ export default function Home() {
                 <ArrowDown className="h-6 w-6 text-gray-400" />
               </div>
             </div>
-            <div className="text-sm text-gray-500 absolute bottom-8 left-4 md:left-8">Hackathon 2025</div>
           </div>
           <div className="w-full md:w-1/3 relative h-[792px] mt-8 md:mt-0 absolute right-0">
             <div className="h-1/3 absolute left-[-10px] bottom-28 w-[1px] bg-black"></div>
@@ -359,7 +504,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-green-500 py-16 md:py-24">
+      <section id="form-idea-section" className="bg-green-500 py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Rejoignez le mouvement Green City</h2>
           <p className="text-white text-lg mb-8 max-w-2xl mx-auto">
@@ -370,9 +515,14 @@ export default function Home() {
             onClick={() => setIsModalOpen(true)}
             className="bg-white text-green-500 px-8 py-3 rounded-full hover:bg-gray-100 transition-colors font-semibold"
           >
-            Je soutiens la transition écologique dans ma ville
+            Proposer une idée
           </button>
-          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleSubmit} />
+          <Modal 
+            isOpen={isModalOpen} 
+            onClose={() => setIsModalOpen(false)} 
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+          />
           <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {people.map((person, idx) => (
               <div key={idx} className="flex items-center bg-white border border-green-200 rounded-lg p-4 shadow-sm">
@@ -408,6 +558,19 @@ export default function Home() {
                 En savoir plus
               </a>
             </div>
+          </div>
+          <div className="mt-12 grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {ideas.map((item, idx) => (
+              <div key={idx} className="flex items-center bg-white border border-green-200 rounded-lg p-4 shadow-sm">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold mr-4">
+                  {item.user?.name ? item.user.name[0].toUpperCase() : item.user?.email[0].toUpperCase()}
+                </div>
+                <div className="flex flex-col items-start">
+                  <div className="text-gray-500 text-xs mb-1">{item.user?.name || item.user?.email}</div>
+                  <div className="font-semibold text-gray-800">{item.idea}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

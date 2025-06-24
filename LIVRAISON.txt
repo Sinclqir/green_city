@@ -1,0 +1,50 @@
+PROJET GREEN CITY - LIVRAISON
+================================
+
+REPO GITHUB:
+https://github.com/[VOTRE_USERNAME]/green-city3
+
+LIEN VERCEL (BACKEND):
+https://green-city3-backend.vercel.app
+
+LIEN GITHUB PAGES (FRONTEND):
+https://[VOTRE_USERNAME].github.io/green-city3
+
+LIEN CODECOV:
+https://codecov.io/gh/[VOTRE_USERNAME]/green-city3
+
+================================
+
+INSTRUCTIONS POUR LE DÉPLOIEMENT:
+================================
+
+1. Créer un compte GitHub et pousser le code
+2. Créer un compte Vercel et connecter le repo
+3. Créer un compte Codecov et connecter le repo
+4. Configurer les secrets GitHub Actions:
+   - VERCEL_TOKEN
+   - VERCEL_ORG_ID  
+   - VERCEL_PROJECT_ID
+   - CYPRESS_RECORD_KEY
+   - PROD_API_URL (URL Vercel du backend)
+
+5. Créer une base de données MySQL en production (Aiven/AlwaysData)
+6. Configurer les variables d'environnement Vercel avec les credentials de prod
+
+================================
+
+FONCTIONNALITÉS IMPLÉMENTÉES:
+================================
+
+✅ Architecture Docker (MySQL/Adminer/Python/React)
+✅ Tests unitaires et d'intégration avec couverture Codecov
+✅ Tests E2E avec Cypress
+✅ Pipeline GitHub Actions (tests + déploiement)
+✅ Déploiement automatique sur Vercel et GitHub Pages
+✅ Base de données MySQL avec admin par défaut
+✅ Formulaire de sauvegarde en base de données
+✅ Liste des utilisateurs avec informations réduites
+✅ Suppression d'utilisateur avec compte admin
+✅ Vue des informations privées des utilisateurs
+✅ Authentification JWT
+✅ Interface utilisateur moderne et responsive 

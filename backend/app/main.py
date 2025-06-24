@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -10,26 +11,56 @@ from dotenv import load_dotenv
 
 from . import models, schemas, database
 from .database import engine, get_db
+from .security import verify_password, create_access_token, get_password_hash, SECRET_KEY, ALGORITHM
 
 load_dotenv()
 
+# Déplacer la création des tables ici, avant que l'app ne soit créée
 models.Base.metadata.create_all(bind=engine)
+
+def create_admin_if_not_exists():
+    db = database.SessionLocal()
+    admin_email = os.getenv("ADMIN_EMAIL")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+    if not admin_email or not admin_password:
+        return
+    admin = db.query(models.User).filter(models.User.email == admin_email).first()
+    if not admin:
+        hashed_password = get_password_hash(admin_password)
+        db_admin = models.User(
+            email=admin_email,
+            name="Admin",
+            hashed_password=hashed_password,
+            is_admin=True
+        )
+        db.add(db_admin)
+        db.commit()
+    db.close()
+
+# Appeler la fonction d'initialisation
+create_admin_if_not_exists()
 
 app = FastAPI()
 
+# Configuration CORS
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Security
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
-ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -68,6 +99,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
+@app.get("/users/me", response_model=schemas.User)
+async def read_users_me(current_user: models.User = Depends(get_current_user)):
+    return current_user
+
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
@@ -76,13 +111,41 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     hashed_password = get_password_hash(user.password)
     db_user = models.User(
         email=user.email,
-        name=user.name,
+        name=user.name if user.name else user.email.split('@')[0],
         hashed_password=hashed_password
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
+
+@app.get("/users/", response_model=List[schemas.User])
+def read_users(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+    return users
+
+@app.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user_by_admin(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Operation not permitted"
+        )
+    
+    user_to_delete = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user_to_delete:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user_to_delete.is_admin:
+        raise HTTPException(status_code=403, detail="Admins cannot be deleted")
+
+    db.delete(user_to_delete)
+    db.commit()
+    return
 
 @app.post("/ideas/", response_model=schemas.Idea)
 def create_idea(
@@ -104,13 +167,9 @@ def create_idea(
 def read_ideas(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
-    if current_user.is_admin:
-        ideas = db.query(models.Idea).offset(skip).limit(limit).all()
-    else:
-        ideas = db.query(models.Idea).filter(models.Idea.user_id == current_user.id).offset(skip).limit(limit).all()
+    ideas = db.query(models.Idea).options(joinedload(models.Idea.user)).order_by(models.Idea.id.desc()).offset(skip).limit(limit).all()
     return ideas
 
 @app.delete("/ideas/{idea_id}")
@@ -126,29 +185,4 @@ def delete_idea(
         raise HTTPException(status_code=403, detail="Not authorized to delete this idea")
     db.delete(idea)
     db.commit()
-    return {"message": "Idea deleted successfully"}
-
-def create_admin_if_not_exists():
-    from .models import User
-    from .database import SessionLocal
-    import os
-
-    db = SessionLocal()
-    admin_email = os.getenv("ADMIN_EMAIL")
-    admin_password = os.getenv("ADMIN_PASSWORD")
-    if not admin_email or not admin_password:
-        return
-    admin = db.query(User).filter(User.email == admin_email).first()
-    if not admin:
-        from .main import get_password_hash
-        db_admin = User(
-            email=admin_email,
-            name="Admin",
-            hashed_password=get_password_hash(admin_password),
-            is_admin=True
-        )
-        db.add(db_admin)
-        db.commit()
-    db.close()
-
-create_admin_if_not_exists() 
+    return {"message": "Idea deleted successfully"} 

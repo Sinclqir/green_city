@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button"
 
 export default function GamePage() {
   const [isClient, setIsClient] = useState(false)
-
-  // This ensures the 3D components only render on the client side
+  
   useEffect(() => {
     setIsClient(true)
   }, [])
