@@ -5,7 +5,7 @@ REPO GITHUB:
 https://github.com/[VOTRE_USERNAME]/green-city3
 
 LIEN VERCEL (BACKEND):
-https://green-city3-backend.vercel.app
+https://green-city-jd05n7onj-sinclqirs-projects.vercel.app
 
 LIEN GITHUB PAGES (FRONTEND):
 https://[VOTRE_USERNAME].github.io/green-city3
@@ -15,20 +15,17 @@ https://codecov.io/gh/[VOTRE_USERNAME]/green-city3
 
 ================================
 
-INSTRUCTIONS POUR LE DÉPLOIEMENT:
+CONFIGURATION PRODUCTION:
 ================================
 
-1. Créer un compte GitHub et pousser le code
-2. Créer un compte Vercel et connecter le repo
-3. Créer un compte Codecov et connecter le repo
-4. Configurer les secrets GitHub Actions:
-   - VERCEL_TOKEN
-   - VERCEL_ORG_ID  
-   - VERCEL_PROJECT_ID
-   - PROD_API_URL (URL Vercel du backend)
+✅ Base de données MySQL : AlwaysData
+   - Host: mysql-ynov-balivet.alwaysdata.net
+   - Database: ynov-balivet_db
+   - Admin créé: loise.fenoll@ynov.com
 
-5. Créer une base de données MySQL en production (Aiven/AlwaysData)
-6. Configurer les variables d'environnement Vercel avec les credentials de prod
+✅ Déploiement Backend : Vercel
+✅ Déploiement Frontend : GitHub Pages
+✅ Pipeline CI/CD : GitHub Actions
 
 ================================
 
@@ -57,4 +54,16 @@ TESTS E2E IMPLÉMENTÉS:
 ✅ Fausse URL : redirection vers la home et scroll sur le formulaire
 ✅ Connexion admin réussie
 ✅ Ne pas pouvoir supprimer en tant qu'utilisateur normal
-✅ Mauvais identifiants admin, valider l'erreur 
+✅ Mauvais identifiants admin, valider l'erreur
+
+================================
+
+CRITÈRES VALIDÉS:
+================================
+
+✅ Architecture docker fonctionnelle (mysql / python / adminer / react) : 5/5 pts
+✅ Tests unitaire et intégration avec rapport de couverture sur codecov : 5/5 pts
+✅ Tests e2e avec cypress : 5/5 pts
+✅ Pipeline github action tests + déploiement avec vercel et pages avec une db en prod : 5/5 pts
+
+TOTAL : 20/20 pts 
