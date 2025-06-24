@@ -24,7 +24,7 @@ describe('GreenCity E2E', () => {
       // Vérifier que quelque chose s'est passé (soit redirection, soit message)
       cy.get('body').then(($body) => {
         const bodyText = $body.text()
-        if (bodyText.includes('Inscription réussie') || bodyText.includes('Erreur') || cy.url().includes('/login')) {
+        if (bodyText.includes('Inscription réussie') || bodyText.includes('Erreur')) {
           cy.log('Formulaire traité avec succès')
         } else {
           cy.log('Aucun message détecté, mais formulaire soumis')
