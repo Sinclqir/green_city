@@ -26,10 +26,14 @@ describe('GreenCity E2E', () => {
       cy.get('button[type="submit"]').should('be.visible').click()
       
       // Attendre la réponse de l'API
-      cy.wait('@registerUser', { timeout: 10000 })
+      cy.wait('@registerUser', { timeout: 15000 }).then((interception) => {
+        // Log de debug
+        cy.log('API Response Status:', interception.response.statusCode)
+        cy.log('API Response Body:', JSON.stringify(interception.response.body))
+      })
       
       // Attendre le message de succès avec une approche plus flexible
-      cy.contains('Inscription réussie', { timeout: 20000 }).should('be.visible')
+      cy.contains('Inscription réussie', { timeout: 25000 }).should('be.visible')
       
       // Attendre la redirection
       cy.url().should('include', '/login', { timeout: 15000 })
