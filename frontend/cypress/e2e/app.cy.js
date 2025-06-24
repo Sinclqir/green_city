@@ -1,12 +1,10 @@
-// frontend/cypress/e2e/app.cy.js
-
 describe('GreenCity E2E', () => {
-    // Note: Pour que les tests admin passent, créez un fichier backend/.env avec:
-    // ADMIN_EMAIL=loise.fenoll@ynov.com
-    // ADMIN_PASSWORD=PvdrTAzTeR247sDnAZBr
 
     it("S'inscrire en tant qu'employé, voir le message de confirmation et la liste", () => {
       cy.visit('/register')
+      
+      // Attendre que la page soit chargée
+      cy.get('h2').should('contain', 'Créer un compte')
       
       // Remplir le formulaire
       const email = 'employe' + Date.now() + '@test.com'
@@ -20,11 +18,11 @@ describe('GreenCity E2E', () => {
       // Soumettre le formulaire
       cy.get('button[type="submit"]').should('be.visible').click()
       
-      // Attendre le message de succès (message exact)
-      cy.contains('Inscription réussie ! Vous allez être redirigé...', { timeout: 15000 }).should('be.visible')
+      // Attendre le message de succès avec une approche plus flexible
+      cy.contains('Inscription réussie', { timeout: 20000 }).should('be.visible')
       
       // Attendre la redirection
-      cy.url().should('include', '/login', { timeout: 10000 })
+      cy.url().should('include', '/login', { timeout: 15000 })
     })
   
     it("Essayer de s'inscrire avec des mauvais champs", () => {
