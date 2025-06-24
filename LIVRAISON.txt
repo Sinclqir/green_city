@@ -25,7 +25,6 @@ INSTRUCTIONS POUR LE DÉPLOIEMENT:
    - VERCEL_TOKEN
    - VERCEL_ORG_ID  
    - VERCEL_PROJECT_ID
-   - CYPRESS_RECORD_KEY
    - PROD_API_URL (URL Vercel du backend)
 
 5. Créer une base de données MySQL en production (Aiven/AlwaysData)
@@ -37,9 +36,8 @@ FONCTIONNALITÉS IMPLÉMENTÉES:
 ================================
 
 ✅ Architecture Docker (MySQL/Adminer/Python/React)
-✅ Tests unitaires et d'intégration avec couverture Codecov
-✅ Tests E2E avec Cypress
-✅ Pipeline GitHub Actions (tests + déploiement)
+✅ Tests E2E avec Cypress (tests frontend uniquement)
+✅ Pipeline GitHub Actions (tests E2E + déploiement)
 ✅ Déploiement automatique sur Vercel et GitHub Pages
 ✅ Base de données MySQL avec admin par défaut
 ✅ Formulaire de sauvegarde en base de données
@@ -47,4 +45,16 @@ FONCTIONNALITÉS IMPLÉMENTÉES:
 ✅ Suppression d'utilisateur avec compte admin
 ✅ Vue des informations privées des utilisateurs
 ✅ Authentification JWT
-✅ Interface utilisateur moderne et responsive 
+✅ Interface utilisateur moderne et responsive
+
+================================
+
+TESTS E2E IMPLÉMENTÉS:
+================================
+
+✅ S'inscrire en tant qu'employé, voir le message de confirmation et la liste
+✅ Essayer de s'inscrire avec des mauvais champs
+✅ Fausse URL : redirection vers la home et scroll sur le formulaire
+✅ Connexion admin réussie
+✅ Ne pas pouvoir supprimer en tant qu'utilisateur normal
+✅ Mauvais identifiants admin, valider l'erreur 
