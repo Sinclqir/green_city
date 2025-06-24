@@ -6,6 +6,10 @@ describe('GreenCity E2E', () => {
       // Attendre que la page soit chargée
       cy.get('h2').should('contain', 'Créer un compte')
       
+      // Attendre que les champs soient prêts
+      cy.get('input[name="email"]').should('be.visible')
+      cy.get('input[name="password"]').should('be.visible')
+      
       // Remplir le formulaire
       const email = 'employe' + Date.now() + '@test.com'
       cy.get('input[name="email"]').clear().type(email)
@@ -15,8 +19,14 @@ describe('GreenCity E2E', () => {
       cy.get('input[name="email"]').should('have.value', email)
       cy.get('input[name="password"]').should('have.value', 'test1234')
       
+      // Intercepter la requête API
+      cy.intercept('POST', '**/users/**').as('registerUser')
+      
       // Soumettre le formulaire
       cy.get('button[type="submit"]').should('be.visible').click()
+      
+      // Attendre la réponse de l'API
+      cy.wait('@registerUser', { timeout: 10000 })
       
       // Attendre le message de succès avec une approche plus flexible
       cy.contains('Inscription réussie', { timeout: 20000 }).should('be.visible')
