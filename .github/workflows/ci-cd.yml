@@ -36,7 +36,8 @@ jobs:
     - name: Install frontend dependencies
       run: |
         cd frontend
-        npm ci --legacy-peer-deps
+        rm -f package-lock.json
+        npm install --legacy-peer-deps
     
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -110,7 +111,8 @@ jobs:
     - name: Install dependencies
       run: |
         cd frontend
-        npm ci --legacy-peer-deps
+        rm -f package-lock.json
+        npm install --legacy-peer-deps
     
     - name: Build frontend
       run: |
