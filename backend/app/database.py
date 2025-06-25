@@ -6,15 +6,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MYSQL_USER = os.getenv("MYSQL_USER")
-MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
-MYSQL_HOST = os.getenv("MYSQL_HOST")
-MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+# Récupérer la variable DATABASE_URL complète si définie
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-if not all([MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_DATABASE]):
-    raise ValueError("Une ou plusieurs variables de base de données ne sont pas définies dans le fichier .env")
+if not DATABASE_URL:
+    MYSQL_USER = os.getenv("MYSQL_USER")
+    MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+    MYSQL_HOST = os.getenv("MYSQL_HOST")
+    MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 
-DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DATABASE}"
+    if not all([MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_DATABASE]):
+        raise ValueError("Variables de base de données manquantes dans le fichier .env")
+
+    DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DATABASE}"
 
 engine = create_engine(DATABASE_URL)
 
