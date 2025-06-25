@@ -10,9 +10,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: process.env.NODE_ENV === 'production' ? '/green-city3' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/green-city3/' : '',
-  output: 'export', // <-- Ajouté pour export statique
+  output: 'export',
   experimental: {
     appDir: true,
   },

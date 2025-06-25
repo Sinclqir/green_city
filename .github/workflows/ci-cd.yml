@@ -97,7 +97,7 @@ jobs:
         cd frontend
         npm run build
       env:
-        NEXT_PUBLIC_API_URL: ${{ secrets.PROD_API_URL }}
+        NODE_ENV: production
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
