@@ -21,6 +21,7 @@ import { Modal } from "@/components/ui/modal"
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import ScrollToForm from "@/components/ScrollToForm"
+import dynamic from "next/dynamic"
 
 // Déclare la constante API_URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
@@ -48,6 +49,12 @@ interface CurrentUser {
   id: number;
   is_admin: boolean;
 }
+
+// Chargement dynamique des composants interactifs
+const InteractiveHome = dynamic(() => import('./interactive-home'), {
+  ssr: false,
+  loading: () => <div>Chargement...</div>
+})
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -574,6 +581,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Section - Chargé dynamiquement */}
+      <InteractiveHome />
 
       {/* Footer */}
       <footer id="contact" className="bg-gray-100 py-12">
