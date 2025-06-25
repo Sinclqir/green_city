@@ -10,7 +10,7 @@ jobs:
   # Tests E2E avec Cypress
   test-e2e:
     runs-on: ubuntu-latest
-    
+
     services:
       mysql:
         image: mysql:8.0
@@ -25,28 +25,28 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-    
+
     - name: Install frontend dependencies
       run: |
         cd frontend
         rm -f package-lock.json
         npm install --legacy-peer-deps
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install backend dependencies
       run: |
         cd backend
         pip install -r requirements.txt
-    
+
     - name: Start backend
       run: |
         cd backend
@@ -58,7 +58,7 @@ jobs:
         ADMIN_EMAIL: loise.fenoll@ynov.com
         ADMIN_PASSWORD: PvdrTAzTeR247sDnAZBr
         SECRET_KEY: test-secret-key-for-ci
-    
+
     - name: Start frontend
       run: |
         cd frontend
@@ -67,66 +67,43 @@ jobs:
         curl -f http://localhost:3000 || echo "Frontend not ready yet"
       env:
         NEXT_PUBLIC_API_URL: http://localhost:8000
-    
+
     - name: Run Cypress tests
       run: |
         cd frontend
         npx cypress run --config video=false,screenshotOnRunFailure=true
       env:
         CYPRESS_baseUrl: http://localhost:3000
-
-  # Déploiement Backend sur Vercel
-  deploy-backend:
-    needs: [test-e2e]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Deploy to Vercel
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-        working-directory: ./backend
-        vercel-args: '--prod'
-      env:
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-        ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-
+        
   # Déploiement Frontend sur GitHub Pages
   deploy-frontend:
     needs: [test-e2e]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-    
+
     - name: Install dependencies
       run: |
         cd frontend
         rm -f package-lock.json
         npm install --legacy-peer-deps
-    
+
     - name: Build frontend
       run: |
         cd frontend
         npm run build
       env:
         NEXT_PUBLIC_API_URL: ${{ secrets.PROD_API_URL }}
-    
+
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./frontend/out 
+        publish_dir: ./frontend/out
