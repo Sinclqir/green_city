@@ -12,11 +12,9 @@ const nextConfig = {
   },
   basePath: process.env.NODE_ENV === 'production' ? '/green-city3' : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? '/green-city3/' : '',
+  output: 'export', // <-- Ajouté pour export statique
   experimental: {
     appDir: true,
-  },
-  async generateStaticParams() {
-    return []
   },
 }
 
