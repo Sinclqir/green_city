@@ -3,8 +3,24 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
-import { CityBuilder } from "@/components/city-builder/city-builder"
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
+
+// Chargement dynamique du CityBuilder pour éviter les erreurs SSR
+const CityBuilder = dynamic(
+  () => import("@/components/city-builder/city-builder").then(mod => ({ default: mod.CityBuilder })),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[700px] bg-gray-100 rounded-lg flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement du jeu...</p>
+        </div>
+      </div>
+    )
+  }
+)
 
 export default function GamePage() {
   const [isClient, setIsClient] = useState(false)
